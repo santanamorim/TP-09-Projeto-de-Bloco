@@ -1,20 +1,44 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { SafeAreaView } from 'react-native';
+import Authentication from './components/Authentication';
+import BooksListPage from './pages/BooksListPage';
+import PhotosPage from './pages/PhotosPage';
 
-export default function App() {
+const Stack = createStackNavigator();
+
+const App = () => {
+  const [authenticatedUser, setAuthenticatedUser] = useState(null);
+
+  const handleLogin = (email) => {
+    setAuthenticatedUser(email);
+  };
+
+  const handleLogout = () => {
+    setAuthenticatedUser(null);
+  };
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false
+          }}
+        >
+          {authenticatedUser ? (
+            <Stack.Screen name="BooksList" component={BooksListPage} />
+          ) : (
+            <Stack.Screen name="Authentication">
+              {props => <Authentication {...props} onLogin={handleLogin} />}
+            </Stack.Screen>
+          )}
+          <Stack.Screen name="PhotosPage" component={PhotosPage} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaView>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
